@@ -1,6 +1,6 @@
 {
   "name": "hemorush",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Jogo 3D sobre compatibilidade sanguínea ABO/Rh",
   "type": "commonjs",

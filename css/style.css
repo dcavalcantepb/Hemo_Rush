@@ -27,6 +27,9 @@
   color-scheme: light;
 }
 html, body { height: 100%; }
+/* Safari no iPhone infla o texto sozinho em modo paisagem, e as caixas não acompanham (linhas sobrepostas,
+   cartões estourando). Isto desliga a inflação; o tamanho do texto é só o que o CSS diz. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   background: var(--sala);
   color: var(--tinta);
