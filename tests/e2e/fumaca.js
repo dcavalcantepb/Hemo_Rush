@@ -36,8 +36,9 @@ async function rodarPerfil(browser, url, perfil) {
   await page.click("#btnIniciar");
   await esperar(page, 'estado === "menu"', 5000, "menu de níveis");
   await page.click("#nv-hemopleno");
-  // no toque, o primeiro toque só seleciona o nível (mostra a arte) e o segundo confirma
-  if (perfil.viewport.hasTouch) await page.click("#nv-hemopleno");
+  // em aparelho sem mouse (hover: none), o 1º toque só seleciona o nível (mostra a arte) e o 2º confirma.
+  // Pergunta ao próprio jogo: o Chrome headless de servidores sem mouse também se declara assim.
+  if (await page.evaluate("semMouse.matches")) await page.click("#nv-hemopleno");
   await esperar(page, 'estado === "tutorial"', 15000, "tutorial");
   await page.evaluate('$("btnTutFim").click()');
   await esperar(page, 'estado === "jogando"', 15000, "partida em andamento");
