@@ -518,3 +518,6 @@ a.doacao { text-decoration: none; box-sizing: border-box; }
 
 .selo-evento { margin: 0; display: inline-block; padding: 6px 14px; border-radius: 999px; background: #ffc533; color: var(--tinta); font-weight: 800; font-size: clamp(12px, 2.8cqh, 16px); letter-spacing: .04em; }
 #btnOpEvento.ligado { background: #fff6e0; border-color: #e3a008; color: var(--tinta); }
+
+/* Medidor de qualidade (só com ?debug na URL) */
+.debug-qualidade { position: fixed; left: 8px; bottom: 8px; z-index: 99; pointer-events: none; font: 600 12px/1 var(--font); color: #fff; background: rgba(19, 38, 58, 0.75); padding: 6px 8px; border-radius: 8px; }

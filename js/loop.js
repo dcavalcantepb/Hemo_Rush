@@ -165,6 +165,7 @@ const INTERVALO_MIN_MS = EH_CELULAR ? 1000 / 60 - 1.5 : 0;
 let ultimoQuadroMs = 0;
 function loop(agoraMs) {
   requestAnimationFrame(loop);
+  Qualidade.pulso(agoraMs);
   if (agoraMs - ultimoQuadroMs < INTERVALO_MIN_MS) return;   // quadro pulado: o relógio acumula o tempo para o próximo
   ultimoQuadroMs = agoraMs;
   const dt = Math.min(0.05, relogio.getDelta());
@@ -176,6 +177,7 @@ function loop(agoraMs) {
   quadro++;
   if (TELAS_PROPRIAS.includes(estado)) return;   // tela própria cobre a sala: não precisa desenhar
   if (estado === "jogando" || quadro % 2 === 0) renderer.render(scene, camera);
+  if (estado === "jogando") Qualidade.quadro(agoraMs);
 }
 let quadro = 0;
 

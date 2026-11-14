@@ -77,5 +77,5 @@ O teste automático roda num navegador simulado e não mede desempenho nem toque
 
 ## Próximos passos recomendados (não feitos)
 
-- **Qualidade adaptativa:** medir os quadros por segundo durante a partida e reduzir a resolução em aparelhos fracos. É a técnica padrão para garantir fluidez em celulares de entrada, mas precisa de teste em aparelho real antes de ser ativada.
+- **Calibrar a qualidade adaptativa** com mais aparelhos. Ela já existe (ver [ARQUITETURA.md](ARQUITETURA.md)) e foi calibrada com um Moto G42 como referência de aparelho fraco; abra o jogo com `?debug` na URL para ver fps e nível em qualquer aparelho.
 - **Funcionamento offline (service worker):** permitiria jogar sem rede depois da primeira visita. Também aumenta o risco de cache desatualizado, então só vale junto com um build com nomes versionados.

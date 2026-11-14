@@ -388,6 +388,9 @@ $("btnRecordesVoltar").addEventListener("click", () => abrirTela("inicio", "btnR
 $("btnOpcoes").addEventListener("click", () => { desarmarLimpar(); abrirTela("opcoes", "btnOpSom"); });
 $("btnOpVoltar").addEventListener("click", () => abrirTela("inicio", "btnOpcoes"));
 $("btnOpSom").addEventListener("click", () => { Som.alternar(); desenharSom(); });
+function desenharGraficos() { $("btnOpGraficos").textContent = Qualidade.descricao(); }
+$("btnOpGraficos").addEventListener("click", () => { Qualidade.proximoModo(); desenharGraficos(); });
+desenharGraficos();
 function desarmarLimpar() {
   const b = $("btnLimparRecordes");
   delete b.dataset.armado; b.classList.remove("confirmar"); b.textContent = "Limpar recordes";

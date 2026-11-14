@@ -30,6 +30,9 @@ async function rodarPerfil(browser, url, perfil) {
 
   await page.goto(url, { waitUntil: "load" });
   await esperar(page, 'estado === "entrada"', 30000, "tela de entrada");
+  // sem nada salvo (ou com o nível máximo salvo), a qualidade começa em Alta
+  const nivelInicial = await page.evaluate("Qualidade.nivelAtual()");
+  if (nivelInicial !== 3) erros.push(`qualidade inicial deveria ser Alta (3), veio ${nivelInicial}`);
   await page.click("#btnEntrar");
   await esperar(page, 'estado === "inicio"', 5000, "tela inicial");
   await page.screenshot({ path: path.join(SAIDA, `${perfil.nome}-inicio.png`) });
@@ -43,7 +46,15 @@ async function rodarPerfil(browser, url, perfil) {
   await page.evaluate('$("btnTutFim").click()');
   await esperar(page, 'estado === "jogando"', 15000, "partida em andamento");
   await new Promise(r => setTimeout(r, 3000));   // deixa o loop do jogo rodar alguns segundos
-  const info = await page.evaluate(`({ estado, estoque: qtdEstoque(), fonte: document.fonts.check('16px "Lexend"') })`);
+  // qualidade adaptativa: força cada nível em plena partida (muda resolução e sombra) e confere que nada quebra
+  for (const n of [3, 2, 1, 0, 3]) {
+    await page.evaluate(`Qualidade.definirModo(${n})`);
+    await new Promise(r => setTimeout(r, 400));
+    const atual = await page.evaluate("Qualidade.nivelAtual()");
+    if (atual !== n) erros.push(`qualidade: pedi nível ${n}, ficou ${atual}`);
+  }
+  await page.evaluate('Qualidade.definirModo("auto")');
+  const info = await page.evaluate(`({ estado, estoque: qtdEstoque(), fonte: document.fonts.check('16px "Lexend"'), qualidade: Qualidade.descricao() })`);
   await page.screenshot({ path: path.join(SAIDA, `${perfil.nome}-jogo.png`) });
   if (!info.fonte) erros.push("fonte Lexend não foi carregada");
   if (info.estoque <= 0) erros.push("estoque vazio no início da partida");
@@ -60,7 +71,7 @@ async function rodarPerfil(browser, url, perfil) {
     try {
       const { erros, info } = await rodarPerfil(browser, url, perfil);
       if (erros.length) { falhou = true; console.error(`✗ ${perfil.nome}:\n  - ${erros.join("\n  - ")}`); }
-      else console.log(`✓ ${perfil.nome}: abriu, entrou no plantão e rodou (estoque=${info.estoque})`);
+      else console.log(`✓ ${perfil.nome}: abriu, entrou no plantão e rodou (estoque=${info.estoque}, ${info.qualidade})`);
     } catch (e) { falhou = true; console.error(`✗ ${perfil.nome}: ${e.message}`); }
   }
   await browser.close(); servidor.close();

@@ -24,6 +24,7 @@ Objetivo: um dia ser publicado num link do site da Hemominas, com a mesma qualid
 - `js/som.js`: objeto `Som`, com efeitos ao vivo e trilhas pré-gravadas (`TRILHAS`: jogo, zen, menu).
 - `js/regras.js`: `compativel(doador, receptor)`, `ANTIGENOS`, `nome()`, `motivoIncompativel()`, `sortear()`. Arquivo puro, testado no Node.
 - `js/cena.js`: sala, estoque, telefones, café, coletor, corredor do laboratório (`LAB`) e `texturaNitida()` para textos nítidos.
+- `js/qualidade.js`: qualidade adaptativa (`NIVEIS_QUALIDADE`, objeto `Qualidade`): mede fps no plantão e ajusta resolução e sombra; botão "Gráficos" em Opções; `?debug` na URL mostra o medidor.
 - `js/bolsas.js`: `criarBolsa`, `matRotulo` (etiqueta), `vagas`. `js/personagens.js`: Ada e transportadores (caixa térmica como maleta).
 - `js/interface.js`: `$`, balões, `flutuar`, tabela de compatibilidade. `js/estado.js`: `jogo`, `estado`, `poderes`, reposição, `pedidosSemSaida`.
 - `js/acoes.js`: pegar, entregar, perder crachá. `js/poderes.js`: Captação, Rede, Café, descarte. `js/hud.js`: placar e dica.
