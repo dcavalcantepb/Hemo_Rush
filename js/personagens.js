@@ -84,49 +84,72 @@ const matCaixaTampa = (function () {
   g.fillStyle = "#b3122a"; g.fillRect(58, 58, 12, 34); g.fillRect(47, 69, 34, 12);
   return new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(c), roughness: 0.6 });
 })();
-function criarTransportador() {
-  const PELES = [0x8d5a3b, 0xd9a47c, 0x5b3a26, 0xe6b98f, 0xb47a52];
-  const PELE = PELES[Math.floor(Math.random() * PELES.length)];
-  const UNIF = 0x24507e, CALCA = 0x1d2b3a;
+// Transportadores são clonados de moldes (um por tom de pele), feitos uma vez na carga. O clone compartilha
+// geometria e material: chegar não cria nada novo na placa de vídeo e sair não deixa nada para trás.
+// (Antes, cada transportador construía ~22 geometrias e ~20 materiais que nunca eram descartados: pico de
+// quadro a cada chegada e memória de vídeo crescendo a sessão inteira.) Os pivôs animados são achados pelo
+// nome depois de clonar, porque o clone copia userData por JSON e perderia as referências.
+const PELES_TRANSPORTADOR = [0x8d5a3b, 0xd9a47c, 0x5b3a26, 0xe6b98f, 0xb47a52];
+const MAT_TRANSP = {
+  unif: mat(0x24507e), calca: mat(0x1d2b3a), bota: mat(0x1a1a1a), refletiva: mat(0xd9f24a, { emissive: 0x2a3300 }),
+  caixa: mat(0xf4f6f8, { roughness: 0.5 }), azul: mat(0x1f5f99), escuro: mat(0x13263a), olho: mat(0x1a120c)
+};
+// geometrias únicas, compartilhadas por todos os moldes (só o material de pele muda entre eles)
+const GEO_TRANSP = {
+  perna: new THREE.CylinderGeometry(0.14, 0.15, 0.36, 10), bota: new THREE.BoxGeometry(0.25, 0.13, 0.34),
+  tronco: new THREE.CylinderGeometry(0.38, 0.47, 0.62, 18), refletiva: new THREE.CylinderGeometry(0.405, 0.43, 0.08, 18),
+  manga: new THREE.CylinderGeometry(0.11, 0.13, 0.42, 10), mao: new THREE.SphereGeometry(0.1, 10, 8),
+  corpoCx: new THREE.BoxGeometry(0.3, 0.36, 0.56), tampaCx: new THREE.BoxGeometry(0.33, 0.07, 0.59), faixaCx: new THREE.BoxGeometry(0.31, 0.06, 0.57),
+  fecho: new THREE.BoxGeometry(0.04, 0.07, 0.04), alca: new THREE.BoxGeometry(0.05, 0.04, 0.3),
+  cabeca: new THREE.SphereGeometry(0.44, 20, 16), olho: new THREE.SphereGeometry(0.05, 8, 6),
+  bone: new THREE.SphereGeometry(0.46, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), aba: new THREE.BoxGeometry(0.5, 0.05, 0.32)
+};
+function construirMoldeTransportador(pele) {
+  const matPele = mat(pele), G = GEO_TRANSP;
   const g = new THREE.Group();
   const m = (geo, material, x, y, z, sombra = true) => { const o = new THREE.Mesh(geo, material); o.position.set(x, y, z); o.castShadow = sombra; g.add(o); return o; };
-  g.userData.pernas = [-0.17, 0.17].map(x => {
-    const piv = new THREE.Group(); piv.position.set(x, 0.42, 0); g.add(piv);
-    const perna = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.15, 0.36, 10), mat(CALCA)); perna.position.y = -0.18; perna.castShadow = true;
-    const bota = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.13, 0.34), mat(0x1a1a1a)); bota.position.set(0, -0.36, 0.05); bota.castShadow = true;
+  [-0.17, 0.17].forEach((x, i) => {
+    const piv = new THREE.Group(); piv.name = "perna" + i; piv.position.set(x, 0.42, 0); g.add(piv);
+    const perna = new THREE.Mesh(G.perna, MAT_TRANSP.calca); perna.position.y = -0.18; perna.castShadow = true;
+    const bota = new THREE.Mesh(G.bota, MAT_TRANSP.bota); bota.position.set(0, -0.36, 0.05); bota.castShadow = true;
     piv.add(perna, bota);
-    return piv;
   });
-  m(new THREE.CylinderGeometry(0.38, 0.47, 0.62, 18), mat(UNIF), 0, 0.72, 0);
-  m(new THREE.CylinderGeometry(0.405, 0.43, 0.08, 18), mat(0xd9f24a, { emissive: 0x2a3300 }), 0, 0.66, 0, false);   // faixa refletiva
+  m(G.tronco, MAT_TRANSP.unif, 0, 0.72, 0);
+  m(G.refletiva, MAT_TRANSP.refletiva, 0, 0.66, 0, false);   // faixa refletiva
   // caixa térmica carregada como maleta: braço direito (lado da câmera) para baixo segurando a alça;
   // o braço esquerdo fica solto ao lado do corpo. Os dois balançam ao andar.
-  const braco = (lado, abertura) => {
-    const piv = new THREE.Group(); piv.position.set(lado * 0.38, 0.95, 0.02); g.add(piv);
+  const braco = (nome, lado, abertura) => {
+    const piv = new THREE.Group(); piv.name = nome; piv.position.set(lado * 0.38, 0.95, 0.02); g.add(piv);
     const arm = new THREE.Group(); arm.rotation.z = lado * abertura; piv.add(arm);
-    const manga = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.42, 10), mat(UNIF)); manga.position.y = -0.2; manga.castShadow = true;
-    const mao = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), mat(PELE)); mao.position.y = -0.42;
+    const manga = new THREE.Mesh(G.manga, MAT_TRANSP.unif); manga.position.y = -0.2; manga.castShadow = true;
+    const mao = new THREE.Mesh(G.mao, matPele); mao.position.y = -0.42;
     arm.add(manga, mao);
     return piv;
   };
-  const bracoLivre = braco(-1, 0.18);
-  const bracoMaleta = braco(1, 0.48);
+  braco("bracoLivre", -1, 0.18);
+  const bracoMaleta = braco("bracoMaleta", 1, 0.48);
   // a maleta pendurada na mão: alça no alto, ao lado da perna
   const maleta = new THREE.Group(); maleta.position.set(0.24, -0.37, 0); bracoMaleta.add(maleta);
-  const corpoCx = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.36, 0.56), mat(0xf4f6f8, { roughness: 0.5 })); corpoCx.position.y = -0.28; corpoCx.castShadow = true;
-  const tampaCx = new THREE.Mesh(new THREE.BoxGeometry(0.33, 0.07, 0.59), matCaixaTampa); tampaCx.position.y = -0.08; tampaCx.castShadow = true;
-  const faixaCx = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.06, 0.57), mat(0x1f5f99)); faixaCx.position.y = -0.3;
+  const corpoCx = new THREE.Mesh(G.corpoCx, MAT_TRANSP.caixa); corpoCx.position.y = -0.28; corpoCx.castShadow = true;
+  const tampaCx = new THREE.Mesh(G.tampaCx, matCaixaTampa); tampaCx.position.y = -0.08; tampaCx.castShadow = true;
+  const faixaCx = new THREE.Mesh(G.faixaCx, MAT_TRANSP.azul); faixaCx.position.y = -0.3;
   maleta.add(corpoCx, tampaCx, faixaCx);
-  [-0.12, 0.12].forEach(zz => { const p = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.07, 0.04), mat(0x13263a)); p.position.set(0, -0.02, zz); maleta.add(p); });
-  const alca = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, 0.3), mat(0x13263a)); alca.position.y = 0.02; maleta.add(alca);
-  g.userData.bracosT = [bracoLivre, bracoMaleta];
+  [-0.12, 0.12].forEach(zz => { const p = new THREE.Mesh(G.fecho, MAT_TRANSP.escuro); p.position.set(0, -0.02, zz); maleta.add(p); });
+  const alca = new THREE.Mesh(G.alca, MAT_TRANSP.escuro); alca.position.y = 0.02; maleta.add(alca);
   // cabeça, olhos e boné com aba
-  m(new THREE.SphereGeometry(0.44, 20, 16), mat(PELE), 0, 1.38, 0.02);
-  [-0.14, 0.14].forEach(x => m(new THREE.SphereGeometry(0.05, 8, 6), mat(0x1a120c), x, 1.38, 0.42, false));
-  const bone = m(new THREE.SphereGeometry(0.46, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.42), mat(0x1f5f99), 0, 1.45, 0);
+  m(G.cabeca, matPele, 0, 1.38, 0.02);
+  [-0.14, 0.14].forEach(x => m(G.olho, MAT_TRANSP.olho, x, 1.38, 0.42, false));
+  const bone = m(G.bone, MAT_TRANSP.azul, 0, 1.45, 0);
   bone.rotation.x = -0.12;
-  m(new THREE.BoxGeometry(0.5, 0.05, 0.32), mat(0x1f5f99), 0, 1.62, 0.42);                                          // aba do boné
+  m(G.aba, MAT_TRANSP.azul, 0, 1.62, 0.42);                                          // aba do boné
   g.rotation.y = -Math.PI / 2; // olhando para a Ada
+  return g;
+}
+const moldesTransportador = PELES_TRANSPORTADOR.map(construirMoldeTransportador);   // na carga, atrás da tela de abertura
+function criarTransportador() {
+  const g = moldesTransportador[Math.floor(Math.random() * moldesTransportador.length)].clone();
+  g.userData.pernas = [g.getObjectByName("perna0"), g.getObjectByName("perna1")];
+  g.userData.bracosT = [g.getObjectByName("bracoLivre"), g.getObjectByName("bracoMaleta")];
   return g;
 }
 

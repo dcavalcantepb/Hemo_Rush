@@ -6,7 +6,7 @@
 // Em Opções, o jogador pode travar um nível ("Gráficos"). Com ?debug na URL, aparece um medidor no canto.
 // =====================================================================
 const NIVEIS_QUALIDADE = [
-  { nome: "Mínima", pixelRatio: 1,    sombra: 0 },
+  { nome: "Mínima", pixelRatio: 1,    sombra: 256 },
   { nome: "Baixa",  pixelRatio: 1.25, sombra: 512 },
   { nome: "Média",  pixelRatio: 1.5,  sombra: 1024 },
   { nome: "Alta",   pixelRatio: 2,    sombra: EH_CELULAR ? 1024 : 2048 }
@@ -45,13 +45,12 @@ const Qualidade = (() => {
     nivel = n;
     const q = NIVEIS_QUALIDADE[n];
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, q.pixelRatio));   // já reaplica o tamanho
-    if (q.sombra) {
-      sol.castShadow = true;
-      if (sol.shadow.mapSize.x !== q.sombra) {
-        sol.shadow.mapSize.set(q.sombra, q.sombra);
-        if (sol.shadow.map) { sol.shadow.map.dispose(); sol.shadow.map = null; }   // o Three recria no tamanho novo
-      }
-    } else sol.castShadow = false;
+    // A sombra só muda de tamanho, nunca é desligada: desligar altera o conjunto de luzes e obriga a recompilar
+    // todos os shaders (congelamento de centenas de ms, medido), justamente quando o jogo já está sofrendo.
+    if (sol.shadow.mapSize.x !== q.sombra) {
+      sol.shadow.mapSize.set(q.sombra, q.sombra);
+      if (sol.shadow.map) { sol.shadow.map.dispose(); sol.shadow.map = null; }   // o Three recria no tamanho novo
+    }
     ultimaTroca = agora; lisoDesde = 0; quadros = 0; janelaInicio = 0; maiorIntervalo = 0;
     if (modo === "auto") try { localStorage.setItem(CHAVE_NIVEL, String(n)); } catch (e) {}
     mostrarDebug();
