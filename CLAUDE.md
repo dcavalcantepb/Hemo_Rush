@@ -7,7 +7,10 @@ Ela pega bolsas de concentrado de hemácias no estoque e entrega aos transportad
 ## Como trabalhar aqui
 
 - Fale sempre em português. O Danilo é biólogo: o conteúdo científico já foi revisado por ele, não precisa insistir em revisão.
-- Tudo fica em **um único arquivo**: `index.html`, com HTML, CSS e JS juntos. As artes são imagens em base64 dentro do arquivo, por isso ele é grande (~530 KB). Leia por trechos e procure pelos títulos das seções.
+- O código fica em **um único arquivo**: `index.html`, com HTML, CSS e JS juntos (~190 KB). Procure pelos títulos das seções.
+- As artes ficam na pasta `assets/` (WebP): `ada.webp` (menu/padrão), `ada-inspiracao.webp` (tela Sobre) e `nivel-<nivel>.webp` (uma por dificuldade, usadas em `ARTE_NIVEIS`). Nada de base64 no `index.html`: ao trocar uma arte, troque o arquivo.
+- O jogo agora precisa da pasta `assets/` junto do `index.html` (não dá mais para mandar só o arquivo).
+- Repositório: local em `23-Hemo_Rush`, espelhado em https://github.com/dcavalcantepb/Hemo_Rush (público, sem dados sensíveis).
 - Biblioteca externa: só o Three.js r128, via cdnjs. Sons e músicas são gerados em código (Web Audio), sem arquivos.
 - Toda mudança precisa funcionar **no computador e no celular**.
 - No celular o jogo é **sempre na horizontal**. Não existe versão em pé: com o celular em pé, aparece o aviso "Gire o celular".
