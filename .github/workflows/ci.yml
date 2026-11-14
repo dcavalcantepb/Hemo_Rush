@@ -1,0 +1,46 @@
+# Verificação automática a cada push e pull request: lint, testes de unidade e teste em navegador real.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testes de unidade e integridade
+        run: npm test
+
+      - name: Teste de fumaça (Chrome headless, PC e celular)
+        run: npm run test:e2e
+
+      - name: Capturas de tela do teste
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: tests/saida/
+          if-no-files-found: ignore
+          retention-days: 7

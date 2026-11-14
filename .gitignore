@@ -1,6 +1,15 @@
-.claude/settings.local.json
+# Dependências e saídas geradas
 node_modules/
+dist/
+tests/saida/
+
+# Configuração local do Claude Code
+.claude/settings.local.json
+
+# Lixo de sistema e editores
 *.bak
 *.tmp
+*.log
 Thumbs.db
 .DS_Store
+.vscode/

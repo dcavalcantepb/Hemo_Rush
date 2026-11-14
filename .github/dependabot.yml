@@ -1,0 +1,16 @@
+# Atualizações mensais das ferramentas de desenvolvimento e das actions do CI.
+# O jogo publicado não tem dependências de npm: Three.js e a fonte ficam em vendor/ e assets/ (atualização manual).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      ferramentas:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

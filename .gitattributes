@@ -1,0 +1,8 @@
+# Fim de linha LF no repositório, em qualquer sistema
+* text=auto eol=lf
+
+# Binários: nunca converter
+*.webp binary
+*.png binary
+*.ico binary
+*.woff2 binary
