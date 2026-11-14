@@ -159,8 +159,14 @@ function trilhaDaTela() {
   if (TELAS_MENU.includes(estado)) return "menu";
   return null;
 }
-function loop() {
+// Celular: no máximo 60 quadros por segundo. Telas de 90/120 Hz desenhariam 1,5×/2× mais, sem ganho visível
+// neste jogo, e com o aparelho esquentando na mesma proporção. Em 120 Hz vira 60; em 90 Hz, 45. PC fica livre.
+const INTERVALO_MIN_MS = EH_CELULAR ? 1000 / 60 - 1.5 : 0;
+let ultimoQuadroMs = 0;
+function loop(agoraMs) {
   requestAnimationFrame(loop);
+  if (agoraMs - ultimoQuadroMs < INTERVALO_MIN_MS) return;   // quadro pulado: o relógio acumula o tempo para o próximo
+  ultimoQuadroMs = agoraMs;
   const dt = Math.min(0.05, relogio.getDelta());
   if (estado === "jogando") atualizar(dt);
   Som.musica(trilhaDaTela(), estado === "jogando" || estado === "pausado" ? nivel() : 0);
@@ -197,4 +203,4 @@ window.addEventListener("keydown", e => { if (estado === "entrada") { e.preventD
 window.addEventListener("pointerdown", e => { if (estado === "entrada" && e.target.id !== "btnEntrar") entrar(); });
 const inicioAbertura = performance.now();
 aguardar("Preparando o plantão…", () => Som.pronta("menu", 0) && Som.pronta("jogo", 0) && performance.now() - inicioAbertura > 3000, 12000, telaDeEntrada);
-loop();
+requestAnimationFrame(loop);

@@ -55,6 +55,7 @@ Os testes atuais continuam valendo como rede de segurança.
 
 ## Performance
 
+- **Quadros por segundo no celular:** limitados a 60 (`INTERVALO_MIN_MS` em `loop.js`). Telas de 90/120 Hz desenhariam 1,5×/2× mais, sem ganho visível e com o aparelho esquentando na mesma proporção. Em 120 Hz o jogo roda a 60; em 90 Hz, a 45. No PC não há limite. Pelo mesmo motivo, o pedido de GPU "high-performance" é só para PC.
 - **Resolução:** limitada a 2× a densidade da tela. O antialias só liga em telas 1×, porque em telas 2× é redundante e caro.
 - **Sombras:** mapa de 1024 px e filtro PCF simples no celular; 2048 px e PCF suave no PC.
 - **Textos 3D:** os textos das bolsas e placas são reduzidos para o tamanho em que aparecem (`texturaNitida`), para ficarem nítidos sem texturas gigantes.

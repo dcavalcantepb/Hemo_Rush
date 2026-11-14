@@ -4,7 +4,8 @@
 const canvas = document.getElementById("cena");
 const EH_CELULAR = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
 // com tela de 2x (a maioria dos celulares) o antialias é redundante e custa caro: só liga em telas de 1x
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: (window.devicePixelRatio || 1) < 2, powerPreference: "high-performance" });
+// "high-performance" só no PC (escolhe a placa dedicada em notebooks); no celular pediria o modo que mais esquenta
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: (window.devicePixelRatio || 1) < 2, powerPreference: EH_CELULAR ? "default" : "high-performance" });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); // até 2x também no celular: texto das bolsas nítido
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = EH_CELULAR ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
