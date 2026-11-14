@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap">
 <style>
 /* Layout: cena 3D em tela cheia; HUD fino no topo, dica contextual embaixo, telas de menu sobrepostas. */
+/* Base: o atributo hidden precisa vencer qualquer display definido abaixo (telas, painéis, botões) */
+[hidden] { display: none !important; }
 :root {
   --zen: #2a9d8f;
   --sala: #dfe7ee;
@@ -901,6 +903,10 @@ const NIVEIS = {
 // Níveis que têm ranking (o Hemozen não entra)
 const RANQUEADOS = ["hemobaby", "hemopleno", "hemossauro"];
 const CONFIG_BASE = JSON.parse(JSON.stringify(CONFIG));
+
+// Estado da partida atual (preenchido por novoJogo). Declarado aqui, antes de qualquer uso: funções como
+// pedidosSemSaida() podem ser chamadas durante a montagem da cena, antes do início do módulo de estado.
+let jogo = null;
 
 // =====================================================================
 // SONS — gerados na hora com Web Audio, sem arquivos. M liga e desliga.
@@ -1985,7 +1991,6 @@ let estado = "menu";
 let poderes = novoEstadoPoderes();
 let chegadas = [];     // bolsas a caminho: { tipo, origem, t }
 let filaEntrada = [];  // já chegaram, esperando vaga no estoque
-let jogo = null;
 // Recarga no começo do plantão (Hemopleno e Hemossauro): um valor só para os dois telefones
 function recargasIniciais() {
   return { captacao: CONFIG.recargaInicialTelefones, rede: CONFIG.recargaInicialTelefones, cafe: CONFIG.cafeRecarga };
