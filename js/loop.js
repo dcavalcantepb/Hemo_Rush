@@ -193,11 +193,13 @@ function telaDeEntrada() {
   estado = "entrada";
   $("textoCarregando").textContent = "";
   $("btnEntrar").hidden = false; $("dicaEntrar").hidden = false;
+  if (toque) $("dicaEntrar").textContent = "ou toque em qualquer lugar";
+  $("dicaTelaCheia").hidden = !precisaDicaTelaCheia();
   focar($("btnEntrar"));
 }
 function entrar() {
   if (estado !== "entrada") return;
-  $("btnEntrar").hidden = true; $("dicaEntrar").hidden = true;
+  $("btnEntrar").hidden = true; $("dicaEntrar").hidden = true; $("dicaTelaCheia").hidden = true;
   Som.tocar("confirmar");   // cria o áudio dentro do gesto do jogador
   travarHorizontal();       // celular: tela cheia e deitado (quando o navegador deixa)
   abrirInicio();

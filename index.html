@@ -6,6 +6,10 @@
 <title>HemoRush</title>
 <meta name="description" content="Jogo sobre compatibilidade sanguínea ABO/Rh: leve a bolsa certa ao paciente certo antes que o tempo acabe.">
 <meta name="theme-color" content="#b3122a">
+<!-- iPhone: o Safari não dá tela cheia a sites; aberto pelo ícone da Tela de Início, o jogo roda sem as barras -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HemoRush">
 <!-- Segurança: só carrega recursos do próprio site. style-src precisa de unsafe-inline por causa de atributos style= no HTML. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -84,6 +88,7 @@
       <p class="carregando-txt" id="textoCarregando">Preparando o plantão…</p>
       <button class="btn-jogo primario" id="btnEntrar" type="button" hidden>Começar</button>
       <p class="carregando-txt" id="dicaEntrar" hidden>ou aperte qualquer tecla</p>
+      <p class="carregando-txt dica-tela-cheia" id="dicaTelaCheia" hidden>Para jogar em tela cheia no iPhone: <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b> e abra pelo ícone.</p>
     </div>
   </div>
 

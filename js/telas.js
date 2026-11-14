@@ -34,6 +34,13 @@ function travarHorizontal() {
     if (p && p.then) p.then(travar).catch(() => {}); else travar();
   } catch (e) {}
 }
+// iPhone no Safari: não existe tela cheia para sites (navigator.standalone só existe no iOS). O único caminho é
+// abrir pelo ícone da Tela de Início; a abertura mostra essa dica, a não ser que o jogo já tenha sido aberto assim.
+function precisaDicaTelaCheia() {
+  const ios = "standalone" in navigator;
+  const temTelaCheia = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  return toque && ios && !navigator.standalone && !temTelaCheia;
+}
 function travarSo() { try { screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape").catch(() => {}); } catch (e) {} }
 // celular virou para em pé no meio do plantão: pausa (o aviso "Gire o celular" cobre a tela)
 if (toque && window.matchMedia) {
