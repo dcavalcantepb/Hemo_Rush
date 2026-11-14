@@ -1,6 +1,9 @@
 // =====================================================================
 // CONFIGURAÇÃO — todos os números de balanceamento ficam aqui.
 // =====================================================================
+// Versão do jogo: aparece no medidor ?debug, para saber qual versão um aparelho carregou (o cache pode segurar
+// a antiga por minutos). Deve bater com "version" do package.json; um teste cobra isso. Suba a cada publicação.
+const VERSAO = "0.2.0";
 const CONFIG = {
   estoqueCapacidade: 20,
   estoqueInicial: 8,

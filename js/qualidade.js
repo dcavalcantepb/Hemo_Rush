@@ -45,7 +45,7 @@ const Qualidade = (() => {
   const debug = /[?&]debug\b/.test(location.search) ? document.createElement("div") : null;
   if (debug) { debug.className = "debug-qualidade"; document.body.appendChild(debug); }
   function mostrarDebug() {
-    if (debug) debug.textContent = `${fpsMedido} fps · ${NIVEIS_QUALIDADE[nivel].nome} · tela ${refresh} Hz · alvo ${Math.round(alvo())}`;
+    if (debug) debug.textContent = `v${VERSAO} · ${fpsMedido} fps · ${NIVEIS_QUALIDADE[nivel].nome} · tela ${refresh} Hz · alvo ${Math.round(alvo())}`;
   }
 
   // fps que este aparelho consegue com o limite de quadros do celular (90 Hz → 45, 120 Hz → 60); no PC, até 60

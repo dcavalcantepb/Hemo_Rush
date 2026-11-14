@@ -12,6 +12,7 @@ Objetivo: um dia ser publicado num link do site da Hemominas, com a mesma qualid
 - Os arquivos de `js/` são **scripts clássicos com `defer`**, que compartilham o escopo global e rodam na ordem do `index.html`. Código que roda na carga de um arquivo (fora de funções) **não pode chamar função de arquivo posterior**: ela ainda não existe. Arquivo novo em `js/` precisa entrar no `index.html`, e um teste cobra isso.
 - Nada externo: Three.js r128 em `vendor/three/`, fonte Lexend em `assets/fonts/`, artes em `assets/img/`. A CSP do `index.html` só permite o próprio site: nada de `<script>` embutido, `onclick=` ou CDN. Sons e músicas são gerados em código (Web Audio), sem arquivos.
 - Texto vindo do jogador (nome no ranking) entra por `textContent`, nunca por `innerHTML`.
+- A cada publicação com mudança visível, suba `VERSAO` em `js/config.js` e `version` no `package.json` (um teste cobra que batem). A versão aparece no medidor `?debug`, para saber o que um aparelho carregou.
 - Toda mudança precisa funcionar **no computador e no celular**.
 - No celular o jogo é **sempre na horizontal**. Não existe versão em pé: com o celular em pé, aparece o aviso "Gire o celular".
 - Telas de jogo têm que caber sem rolagem. Telas de texto (Sobre, tutorial) podem rolar.

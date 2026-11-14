@@ -59,6 +59,12 @@ test("nenhum recurso externo é carregado (tudo servido pelo próprio site)", ()
   }
 });
 
+test("a VERSAO do jogo (js/config.js) bate com a version do package.json", () => {
+  const noCodigo = codigoJs["config.js"].match(/^const VERSAO = "([^"]+)";/m);
+  assert.ok(noCodigo, "VERSAO não encontrada em js/config.js");
+  assert.equal(noCodigo[1], JSON.parse(ler("package.json")).version);
+});
+
 test("o Three.js vendorizado é exatamente o r128 oficial (hash do cdnjs)", () => {
   const conteudo = fs.readFileSync(path.join(RAIZ, "vendor/three/three.min.js"));
   const hash = crypto.createHash("sha512").update(conteudo).digest("base64");
