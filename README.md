@@ -6,6 +6,8 @@ Jogo 3D, com vista de cima, sobre compatibilidade sanguínea ABO/Rh, com tema da
 
 Você é a Ada, farmacêutica bioquímica da prova cruzada. Ela pega bolsas de concentrado de hemácias no estoque e as entrega aos transportadores antes que o tempo do pedido acabe, respeitando as regras reais de compatibilidade. Quando erra, o jogo explica o porquê ("Paciente O− tem anti-A e é Rh−: não recebe A+").
 
+**Jogar (versão de teste):** https://dcavalcantepb.github.io/Hemo_Rush/
+
 Funciona no computador (teclado) e no celular deitado (joystick de toque). Tem quatro níveis: Hemobaby, Hemopleno, Hemossauro e Hemozen, este último sem pressão.
 
 ## Rodar localmente
