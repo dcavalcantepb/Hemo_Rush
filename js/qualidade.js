@@ -15,13 +15,16 @@ const Qualidade = (() => {
   const MAX = NIVEIS_QUALIDADE.length - 1;
   const CHAVE_MODO = "hemorush-graficos";         // "auto" ou o índice do nível travado em Opções
   const CHAVE_NIVEL = "hemorush-graficos-nivel";  // último nível que o automático usou
+  const CHAVE_RUIM = "hemorush-graficos-ruim";    // nível que travou, lembrado por alguns dias (não fica tentando a cada visita)
+  const RUIM_VALIDADE_MS = 7 * 24 * 3600e3;
   const JANELA_MS = 2000;             // mede os fps em janelas de 2 s
   const FPS_RUIM = 40;                // abaixo disso por uma janela inteira: baixa um nível
   const ESPERA_APOS_TROCA_MS = 4000;  // depois de trocar, espera o jogo assentar antes de julgar de novo
   const LISO_PARA_SUBIR_MS = 15000;   // só sobe depois de tanto tempo liso seguido
   const SOLUCO_MS = 300;              // um quadro maior que isso é soluço (troca de aba, compilação): descarta a janela
 
-  let modo = "auto", nivel = MAX, nivelRuim = MAX + 1;   // nivelRuim: menor nível que travou nesta sessão
+  // Primeira visita: celular começa em Média (aparelho fraco cai só um degrau; forte sobe para Alta após 15 s liso).
+  let modo = "auto", nivel = EH_CELULAR ? MAX - 1 : MAX, nivelRuim = MAX + 1;   // nivelRuim: menor nível que travou
   let refresh = 60, pulsos = 0, pulsoInicio = 0;         // taxa da tela (Hz), medida pelos requestAnimationFrame
   let quadros = 0, janelaInicio = 0, ultimoQuadro = 0, maiorIntervalo = 0;
   let ultimaTroca = 0, lisoDesde = 0, fpsMedido = 0;
@@ -30,7 +33,14 @@ const Qualidade = (() => {
     if (m !== null && m !== "auto" && NIVEIS_QUALIDADE[Number(m)]) modo = Number(m);
     const n = localStorage.getItem(CHAVE_NIVEL);   // cuidado: Number(null) é 0, e 0 é um nível válido (Mínima)
     if (n !== null && NIVEIS_QUALIDADE[Number(n)]) nivel = Number(n);
+    const r = JSON.parse(localStorage.getItem(CHAVE_RUIM) || "null");
+    if (r && NIVEIS_QUALIDADE[r.n] && Date.now() - r.t < RUIM_VALIDADE_MS) nivelRuim = r.n;
   } catch (e) {}
+  if (nivel >= nivelRuim) nivel = Math.max(0, nivelRuim - 1);
+  function lembrarRuim(n) {
+    nivelRuim = n;
+    try { localStorage.setItem(CHAVE_RUIM, JSON.stringify({ n, t: Date.now() })); } catch (e) {}
+  }
 
   const debug = /[?&]debug\b/.test(location.search) ? document.createElement("div") : null;
   if (debug) { debug.className = "debug-qualidade"; document.body.appendChild(debug); }
@@ -83,7 +93,7 @@ const Qualidade = (() => {
     if (soluco) { lisoDesde = 0; return; }
     if (modo !== "auto" || agora - ultimaTroca < ESPERA_APOS_TROCA_MS) return;
     if (fps < FPS_RUIM) {
-      if (nivel > 0) { nivelRuim = nivel; aplicar(nivel - 1, agora); }
+      if (nivel > 0) { lembrarRuim(nivel); aplicar(nivel - 1, agora); }
       lisoDesde = 0;
     } else if (fps >= alvo() * 0.9) {
       if (!lisoDesde) lisoDesde = agora;
@@ -95,7 +105,11 @@ const Qualidade = (() => {
   function definirModo(m) {
     modo = m;
     try { localStorage.setItem(CHAVE_MODO, String(m)); } catch (e) {}
-    if (m === "auto") { nivelRuim = MAX + 1; aplicar(nivel, performance.now()); }
+    if (m === "auto") {   // o jogador pediu automático de novo: reavalia do zero
+      nivelRuim = MAX + 1;
+      try { localStorage.removeItem(CHAVE_RUIM); } catch (e) {}
+      aplicar(nivel, performance.now());
+    }
     else aplicar(m, performance.now());
   }
   function proximoModo() { definirModo(modo === "auto" ? MAX : modo === 0 ? "auto" : modo - 1); }   // auto → Alta → … → Mínima → auto

@@ -29,10 +29,13 @@ async function rodarPerfil(browser, url, perfil) {
   page.on("response", r => { if (r.status() >= 400) erros.push(`HTTP ${r.status()}: ${r.url()}`); });
 
   await page.goto(url, { waitUntil: "load" });
+  await page.evaluate("localStorage.clear()");   // primeira visita de verdade (os dois perfis compartilham o armazenamento)
+  await page.reload({ waitUntil: "load" });
   await esperar(page, 'estado === "entrada"', 30000, "tela de entrada");
-  // sem nada salvo (ou com o nível máximo salvo), a qualidade começa em Alta
+  // primeira visita: PC começa em Alta (3) e celular em Média (2)
+  const esperado = perfil.viewport.isMobile ? 2 : 3;
   const nivelInicial = await page.evaluate("Qualidade.nivelAtual()");
-  if (nivelInicial !== 3) erros.push(`qualidade inicial deveria ser Alta (3), veio ${nivelInicial}`);
+  if (nivelInicial !== esperado) erros.push(`qualidade inicial deveria ser ${esperado}, veio ${nivelInicial}`);
   await page.click("#btnEntrar");
   await esperar(page, 'estado === "inicio"', 5000, "tela inicial");
   await page.screenshot({ path: path.join(SAIDA, `${perfil.nome}-inicio.png`) });

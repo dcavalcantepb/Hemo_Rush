@@ -176,8 +176,10 @@ function loop(agoraMs) {
   // fora do plantão a cena fica parada atrás dos menus: desenha em meio ritmo e sobra fôlego para o som
   quadro++;
   if (TELAS_PROPRIAS.includes(estado)) return;   // tela própria cobre a sala: não precisa desenhar
-  if (estado === "jogando" || quadro % 2 === 0) renderer.render(scene, camera);
+  // A qualidade é avaliada (e, se for o caso, trocada) ANTES de desenhar: mudar a resolução apaga o canvas, e se
+  // isso viesse depois do desenho a tela ficaria em branco até o quadro seguinte (piscada visível no celular).
   if (estado === "jogando") Qualidade.quadro(agoraMs);
+  if (estado === "jogando" || quadro % 2 === 0) renderer.render(scene, camera);
 }
 let quadro = 0;
 
